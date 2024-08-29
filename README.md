@@ -24,25 +24,26 @@ Control de hilos con wait/notify. Productor/consumidor.
 Aunque el consumo de la CPU sigue siendo practicamente el mismo (entre 10% y 12%) lo que sí cambia drásticamente es la memoria, y podemos visualizar cuando el hilo producer añade números a la cola, y cuando el hilo consumer los está sacando, este consumo se debe a que el hilo consumer siempre está tratando de consumir de la cola.
 
 
-3. Haga los ajustes necesarios para que la solución use más eficientemente la CPU, teniendo en cuenta que -por ahora- la producción es lenta y el consumo es rápido. Verifique con JVisualVM que el consumo de CPU se reduzca.
+2. Haga los ajustes necesarios para que la solución use más eficientemente la CPU, teniendo en cuenta que -por ahora- la producción es lenta y el consumo es rápido. Verifique con JVisualVM que el consumo de CPU se reduzca.
 
 
 	![image](https://github.com/user-attachments/assets/202847ff-b401-4119-8ee9-13fd81bb1b6c)
 	Para lograr esta reducción en el consumo de CPU, sincronizamos los hilos producer y consumer, los primeros van a esperar cuando la cola esté llena (la cola tenga un tamaño igual al del límite de stock) y los segundos van a esperar cuando la cola esté vacía, en ambos casos se debe sincronizar el acceso a la cola.
 
-5. Haga que ahora el productor produzca muy rápido, y el consumidor consuma lento. Teniendo en cuenta que el productor conoce un límite de Stock (cuantos elementos debería tener, a lo sumo en la cola), haga que dicho límite se respete. Revise el API de la colección usada como cola para ver cómo garantizar que dicho límite no se supere. Verifique que, al poner un límite pequeño para el 'stock', no haya consumo alto de CPU ni errores.
+3. Haga que ahora el productor produzca muy rápido, y el consumidor consuma lento. Teniendo en cuenta que el productor conoce un límite de Stock (cuantos elementos debería tener, a lo sumo en la cola), haga que dicho límite se respete. Revise el API de la colección usada como cola para ver cómo garantizar que dicho límite no se supere. Verifique que, al poner un límite pequeño para el 'stock', no haya consumo alto de CPU ni errores.
 
 
-	Para que el límite ed Stock sea respetado agregamos un condicional en el run del hilo producer:
-![image](https://github.com/user-attachments/assets/62997e02-95d0-48a3-aaef-b0d5913285c4)
+	Para que el límite de Stock sea respetado agregamos un condicional en el run del hilo producer, ademas de dormir solo 0.005 ms para que produzca más rápido de lo que se consume:
+![image](https://github.com/user-attachments/assets/53089444-b19d-46b4-8e5d-1d1db0f57087)
 
-Con este cambio, y coloanco el límite de Stock en 1, tenemos este resultado:
+	Para que los consumidores no consuman tan rápido, los dormimos siempre que consuman durante 0.01 ms:
+![image](https://github.com/user-attachments/assets/02d05075-ab15-4999-be55-5db1ae6d17f9)
 
-![image](https://github.com/user-attachments/assets/5b88ca28-b450-4c4a-8f4d-e4e8070e4477)
 
 
 y el consumo de CPU es este:
-![image](https://github.com/user-attachments/assets/a0ba0606-5de9-419b-a69c-cb4da44213aa)
+![image](https://github.com/user-attachments/assets/f9041598-b69a-44e3-b30a-8f9fac5ee495)
+
 
 
 

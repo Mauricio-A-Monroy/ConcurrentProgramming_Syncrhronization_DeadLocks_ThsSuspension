@@ -44,6 +44,12 @@ public class Producer extends Thread {
                 queue.add(dataSeed);
                 queue.notifyAll();
             }
+
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }
