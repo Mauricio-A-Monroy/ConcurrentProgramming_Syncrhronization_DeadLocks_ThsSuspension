@@ -33,6 +33,19 @@ Control de hilos con wait/notify. Productor/consumidor.
 5. Haga que ahora el productor produzca muy rápido, y el consumidor consuma lento. Teniendo en cuenta que el productor conoce un límite de Stock (cuantos elementos debería tener, a lo sumo en la cola), haga que dicho límite se respete. Revise el API de la colección usada como cola para ver cómo garantizar que dicho límite no se supere. Verifique que, al poner un límite pequeño para el 'stock', no haya consumo alto de CPU ni errores.
 
 
+	Para que el límite ed Stock sea respetado agregamos un condicional en el run del hilo producer:
+![image](https://github.com/user-attachments/assets/62997e02-95d0-48a3-aaef-b0d5913285c4)
+
+Con este cambio, y coloanco el límite de Stock en 1, tenemos este resultado:
+
+![image](https://github.com/user-attachments/assets/5b88ca28-b450-4c4a-8f4d-e4e8070e4477)
+
+
+y el consumo de CPU es este:
+![image](https://github.com/user-attachments/assets/a0ba0606-5de9-419b-a69c-cb4da44213aa)
+
+
+
 ##### Parte II. – Antes de terminar la clase.
 
 Teniendo en cuenta los conceptos vistos de condición de carrera y sincronización, haga una nueva versión -más eficiente- del ejercicio anterior (el buscador de listas negras). En la versión actual, cada hilo se encarga de revisar el host en la totalidad del subconjunto de servidores que le corresponde, de manera que en conjunto se están explorando la totalidad de servidores. Teniendo esto en cuenta, haga que:
