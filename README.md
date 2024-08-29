@@ -12,24 +12,24 @@ Control de hilos con wait/notify. Productor/consumidor.
 1. Revise el funcionamiento del programa y ejecútelo. Mientras esto ocurren, ejecute jVisualVM y revise el consumo de CPU del proceso correspondiente. A qué se debe este consumo?, cual es la clase responsable?
 
 
-   ![image](https://github.com/user-attachments/assets/52a899b7-711b-407a-aca3-4330b4fc02a2)
+![image](https://github.com/user-attachments/assets/52a899b7-711b-407a-aca3-4330b4fc02a2)
 
 
 	Al ejecutar el programa original, no vimos un gran consumo de CPU ni de memoria, así que decidimos dejar de dormir el hilo producer y obtuvimos este resultado:
 
 
-   ![image](https://github.com/user-attachments/assets/ab2cecbf-fa6a-427a-8580-ef0057862f50)
+![image](https://github.com/user-attachments/assets/ab2cecbf-fa6a-427a-8580-ef0057862f50)
 
 
-   Aunque el consumo de la CPU sigue siendo practicamente el mismo (entre 10% y 12%) lo que sí cambia drásticamente es la memoria, y podemos visualizar cuando el hilo producer añade números a la cola, y cuando el hilo consumer los está sacando, este consumo se debe a que el hilo consumer siempre está tratando de consumir de la cola.
+Aunque el consumo de la CPU sigue siendo practicamente el mismo (entre 10% y 12%) lo que sí cambia drásticamente es la memoria, y podemos visualizar cuando el hilo producer añade números a la cola, y cuando el hilo consumer los está sacando, este consumo se debe a que el hilo consumer siempre está tratando de consumir de la cola.
 
 
 3. Haga los ajustes necesarios para que la solución use más eficientemente la CPU, teniendo en cuenta que -por ahora- la producción es lenta y el consumo es rápido. Verifique con JVisualVM que el consumo de CPU se reduzca.
 
 
-	![image](https://github.com/user-attachments/assets/d39fd33e-b95b-4416-8ed5-f29a07100772)
-	Para lograr esta reducción en el consumo de CPU, hicimos que el productor añadiera un número a la cola cada segundo y que el consumidor sacara de la cola un número cada 2 segundos.
-   
+	![image](https://github.com/user-attachments/assets/202847ff-b401-4119-8ee9-13fd81bb1b6c)
+	Para lograr esta reducción en el consumo de CPU, sincronizamos los hilos producer y consumer, los primeros van a esperar cuando la cola esté llena (la cola tenga un tamaño igual al del límite de stock) y los segundos van a esperar cuando la cola esté vacía, en ambos casos se debe sincronizar el acceso a la cola.
+
 5. Haga que ahora el productor produzca muy rápido, y el consumidor consuma lento. Teniendo en cuenta que el productor conoce un límite de Stock (cuantos elementos debería tener, a lo sumo en la cola), haga que dicho límite se respete. Revise el API de la colección usada como cola para ver cómo garantizar que dicho límite no se supere. Verifique que, al poner un límite pequeño para el 'stock', no haya consumo alto de CPU ni errores.
 
 
@@ -76,13 +76,13 @@ Sincronización y Dead-Locks.
 
 6. Identifique posibles regiones críticas en lo que respecta a la pelea de los inmortales. Implemente una estrategia de bloqueo que evite las condiciones de carrera. Recuerde que si usted requiere usar dos o más ‘locks’ simultáneamente, puede usar bloques sincronizados anidados:
 
-	```java
-	synchronized(locka){
-		synchronized(lockb){
-			…
-		}
-	}
-	```
+   ```java
+   synchronized(locka){
+       synchronized(lockb){
+           …
+       }
+   }
+   ```
 
 7. Tras implementar su estrategia, ponga a correr su programa, y ponga atención a si éste se llega a detener. Si es así, use los programas jps y jstack para identificar por qué el programa se detuvo.
 

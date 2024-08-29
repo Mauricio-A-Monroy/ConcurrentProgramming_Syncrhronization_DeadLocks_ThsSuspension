@@ -22,7 +22,7 @@ public class StartProduction {
         
         Queue<Integer> queue=new LinkedBlockingQueue<>();
         
-        long stockLimit  = 100;
+        long stockLimit  = 10;
 
         new Producer(queue,stockLimit).start();
         //new Producer(queue,stockLimit).start();

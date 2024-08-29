@@ -27,16 +27,17 @@ public class Consumer extends Thread{
         while (true) {
 
             synchronized (queue){
-                if (queue.size() > 0) {
-                    int elem=queue.poll();
-                    System.out.println("Consumer consumes "+elem);
+                while(queue.size() == 0){
+                    try {
+                        queue.wait();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-            }
 
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Producer.class.getName()).log(Level.SEVERE, null, ex);
+                int elem = queue.poll();
+                System.out.println("Consumer consumes " + elem);
+                queue.notifyAll();
             }
         }
     }
