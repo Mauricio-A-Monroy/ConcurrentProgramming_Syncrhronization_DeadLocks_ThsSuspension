@@ -22,7 +22,7 @@ import javax.swing.JTextField;
 import java.awt.Color;
 import javax.swing.JScrollBar;
 
-public class ControlFrame extends JFrame {
+public class  ControlFrame extends JFrame {
 
     private static final int DEFAULT_IMMORTAL_HEALTH = 100;
     private static final int DEFAULT_DAMAGE_VALUE = 10;
@@ -93,12 +93,11 @@ public class ControlFrame extends JFrame {
                  */
                 int sum = 0;
                 for (Immortal im : immortals) {
+                    im.setPaused(true);
                     sum += im.getHealth();
                 }
 
                 statisticsLabel.setText("<html>"+immortals.toString()+"<br>Health sum:"+ sum);
-                
-                
 
             }
         });
@@ -108,9 +107,10 @@ public class ControlFrame extends JFrame {
 
         btnResume.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                /**
-                 * IMPLEMENTAR
-                 */
+
+                for (Immortal im : immortals) {
+                    im.setPaused(false);
+                }
 
             }
         });

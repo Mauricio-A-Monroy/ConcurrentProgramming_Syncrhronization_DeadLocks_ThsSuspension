@@ -17,6 +17,8 @@ public class Immortal extends Thread {
 
     private final Random r = new Random(System.currentTimeMillis());
 
+    private boolean isPaused = false;
+
 
     public Immortal(String name, List<Immortal> immortalsPopulation, int health, int defaultDamageValue, ImmortalUpdateReportCallback ucb) {
         super(name);
@@ -30,6 +32,17 @@ public class Immortal extends Thread {
     public void run() {
 
         while (true) {
+
+            synchronized (this) {
+                while (isPaused) {
+                    try {
+                        wait();  // Pausa el hilo si `paused` es true
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
             Immortal im;
 
             int myIndex = immortalsPopulation.indexOf(this);
@@ -46,7 +59,7 @@ public class Immortal extends Thread {
             this.fight(im);
 
             try {
-                Thread.sleep(1);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -73,6 +86,15 @@ public class Immortal extends Thread {
 
     public int getHealth() {
         return health;
+    }
+
+    public void setPaused(boolean isPaused) {
+        synchronized (this) {
+            this.isPaused = isPaused;
+            if (!isPaused) {
+                notifyAll();  // Notifica a todos los hilos que están esperando
+            }
+        }
     }
 
     @Override
