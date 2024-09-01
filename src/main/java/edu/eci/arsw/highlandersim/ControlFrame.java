@@ -94,6 +94,9 @@ public class  ControlFrame extends JFrame {
                 int sum = 0;
                 for (Immortal im : immortals) {
                     im.setPaused(true);
+                }
+
+                for (Immortal im : immortals) {
                     sum += im.getHealth();
                 }
 
