@@ -1,7 +1,6 @@
 package edu.eci.arsw.highlandersim;
 
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Immortal extends Thread {
 
@@ -70,14 +69,23 @@ public class Immortal extends Thread {
 
     public void fight(Immortal i2) {
 
-        if (i2.getHealth() > 0) {
-            i2.changeHealth(i2.getHealth() - defaultDamageValue);
-            this.health += defaultDamageValue;
-            updateCallback.processReport("Fight: " + this + " vs " + i2+"\n");
-        } else {
-            updateCallback.processReport(this + " says:" + i2 + " is already dead!\n");
-        }
+        // Sorting by name
+        List<Immortal> immortals = new ArrayList<>();
+        immortals.add(this);
+        immortals.add(i2);
+        Collections.sort(immortals, new ImmortalComparator());
 
+        synchronized (immortals.get(0)){
+            synchronized (immortals.get(1)){
+                if (i2.getHealth() > 0) {
+                    i2.changeHealth(i2.getHealth() - defaultDamageValue);
+                    this.health += defaultDamageValue;
+                    updateCallback.processReport("Fight: " + this + " vs " + i2+"\n");
+                } else {
+                    updateCallback.processReport(this + " says:" + i2 + " is already dead!\n");
+                }
+            }
+        }
     }
 
     public void changeHealth(int v) {
