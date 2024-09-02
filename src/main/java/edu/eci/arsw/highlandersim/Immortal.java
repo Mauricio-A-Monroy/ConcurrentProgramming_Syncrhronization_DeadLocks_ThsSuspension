@@ -18,6 +18,8 @@ public class Immortal extends Thread {
 
     private boolean isPaused = false;
 
+    private boolean stillAlive;
+
 
     public Immortal(String name, List<Immortal> immortalsPopulation, int health, int defaultDamageValue, ImmortalUpdateReportCallback ucb) {
         super(name);
@@ -26,11 +28,12 @@ public class Immortal extends Thread {
         this.immortalsPopulation = immortalsPopulation;
         this.health = health;
         this.defaultDamageValue=defaultDamageValue;
+        stillAlive = true;
     }
 
     public void run() {
 
-        while (true) {
+        while (stillAlive) {
 
             synchronized (this) {
                 while (isPaused) {
@@ -68,7 +71,6 @@ public class Immortal extends Thread {
     }
 
     public void fight(Immortal i2) {
-
         // Sorting by name
         List<Immortal> immortals = new ArrayList<>();
         immortals.add(this);
@@ -77,12 +79,18 @@ public class Immortal extends Thread {
 
         synchronized (immortals.get(0)){
             synchronized (immortals.get(1)){
-                if (i2.getHealth() > 0) {
-                    i2.changeHealth(i2.getHealth() - defaultDamageValue);
-                    this.health += defaultDamageValue;
-                    updateCallback.processReport("Fight: " + this + " vs " + i2+"\n");
-                } else {
-                    updateCallback.processReport(this + " says:" + i2 + " is already dead!\n");
+                if(immortalsPopulation.contains(this) && immortalsPopulation.contains(i2)){
+                    if (i2.getHealth() > 0) {
+                        i2.changeHealth(i2.getHealth() - defaultDamageValue);
+                        this.health += defaultDamageValue;
+                        updateCallback.processReport("Fight: " + this + " vs " + i2+"\n");
+                    } else if (immortalsPopulation.contains(i2)) {
+                        i2.alreadyDead();
+                        immortalsPopulation.remove(i2);
+                        System.out.println(i2.name + " HAS DIED!!! AHHHHHHHHHH!!!!!!!!!!!!!");
+                        System.out.println(immortalsPopulation);
+                        updateCallback.processReport(this + " says:" + i2 + " is already dead!\n");
+                    }
                 }
             }
         }
@@ -96,6 +104,8 @@ public class Immortal extends Thread {
         return health;
     }
 
+    public void alreadyDead(){ this.stillAlive = false; }
+
     public void setPaused(boolean isPaused) {
         synchronized (this) {
             this.isPaused = isPaused;
@@ -107,7 +117,6 @@ public class Immortal extends Thread {
 
     @Override
     public String toString() {
-
         return name + "[" + health + "]";
     }
 

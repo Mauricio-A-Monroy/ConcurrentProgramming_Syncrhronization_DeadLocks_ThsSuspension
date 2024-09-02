@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import java.awt.Color;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.JScrollBar;
 
 public class  ControlFrame extends JFrame {
@@ -92,6 +93,9 @@ public class  ControlFrame extends JFrame {
 				 * COMPLETAR
                  */
                 int sum = 0;
+
+                System.out.println("THE GAME HAS BEEN PAUSED AND THESE ARE THE IMMORTALS: " + immortals);
+
                 for (Immortal im : immortals) {
                     im.setPaused(true);
                 }
@@ -155,10 +159,10 @@ public class  ControlFrame extends JFrame {
             List<Immortal> il = new LinkedList<Immortal>();
 
             for (int i = 0; i < ni; i++) {
-                Immortal i1 = new Immortal("im" + i, il, DEFAULT_IMMORTAL_HEALTH, DEFAULT_DAMAGE_VALUE,ucb);
+                Immortal i1 = new Immortal("im" + i, il, DEFAULT_IMMORTAL_HEALTH, DEFAULT_DAMAGE_VALUE, ucb);
                 il.add(i1);
             }
-            return il;
+            return new CopyOnWriteArrayList<>(il);
         } catch (NumberFormatException e) {
             JOptionPane.showConfirmDialog(null, "Número inválido.");
             return null;
