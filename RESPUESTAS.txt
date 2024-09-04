@@ -1,0 +1,9 @@
+En la simulación actual, los inmortales luchan entre sí hasta que uno de ellos muere. Si un inmortal muere, se intenta eliminarlo de la lista de inmortales activos. Sin embargo, la eliminación de un inmortal muerto de la lista podría crear una condición de carrera debido a los siguientes factores:
+
+-  Acceso Concurrente a la Lista: Varios hilos pueden intentar acceder y modificar la lista de inmortales (immortalsPopulation) al mismo tiempo, especialmente cuando un inmortal está siendo eliminado. Si un hilo accede a la lista mientras otro hilo está eliminando un inmortal, podría resultar en un comportamiento impredecible, como excepciones o corrupción de datos.
+
+-  Iteración Concurrente: Si algún hilo está iterando sobre la lista mientras otro hilo elimina un elemento, podría causar una excepción ConcurrentModificationException.
+
+Conclusiones:
+
+-  Condiciones de Carrera: La eliminación de inmortales muertos puede crear condiciones de carrera si no se maneja con cuidado. Aunque CopyOnWriteArrayList proporciona una cierta seguridad para operaciones concurrentes, la eliminación de elementos y las operaciones concurrentes deben ser cuidadosamente coordinadas para evitar inconsistencias.
