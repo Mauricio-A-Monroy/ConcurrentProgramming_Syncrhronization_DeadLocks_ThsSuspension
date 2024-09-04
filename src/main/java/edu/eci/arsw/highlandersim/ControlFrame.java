@@ -21,6 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import java.awt.Color;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.JScrollBar;
 
 public class  ControlFrame extends JFrame {
@@ -95,7 +96,7 @@ public class  ControlFrame extends JFrame {
                     im.setPaused(true);
                 }
 
-                System.out.println("THE GAME HAS BEEN PAUSED AND THESE ARE THE IMMORTALS: " + immortals.toString());
+                // System.out.println("THE GAME HAS BEEN PAUSED AND THESE ARE THE IMMORTALS: " + immortals.toString());
 
                 for (Immortal im : immortals) {
                     sum += im.getHealth();
@@ -138,6 +139,7 @@ public class  ControlFrame extends JFrame {
 
                 for (Immortal im : immortals) {
                     im.alreadyDead();
+                    im.setPaused(false);
                     try {
                         im.join();
                     } catch (InterruptedException ex) {
@@ -145,7 +147,7 @@ public class  ControlFrame extends JFrame {
                     }
                 }
 
-                System.out.println("THE GAME HAS BEEN STOPED AND THESE ARE THE IMMORTALS: " + immortals.toString());
+                // System.out.println("THE GAME HAS BEEN STOPPED AND THESE ARE THE IMMORTALS: " + immortals.toString());
 
                 for (Immortal im : immortals) {
                     sum += im.getHealth();
