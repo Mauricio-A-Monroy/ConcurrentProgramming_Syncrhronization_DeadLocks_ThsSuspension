@@ -11,6 +11,7 @@ import edu.eci.arsw.threads.BlackListThread;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,7 +41,7 @@ public class HostBlackListsValidator {
         HostBlacklistsDataSourceFacade skds=HostBlacklistsDataSourceFacade.getInstance();
         int serverAmount = skds.getRegisteredServersCount();
         List<BlackListThread> threads = new ArrayList<BlackListThread>();
-        List<Integer> blackListOcurrences = new ArrayList<>();
+        CopyOnWriteArrayList<Integer> blackListOcurrences = new CopyOnWriteArrayList<>();
         AtomicInteger checkedListsCount = new AtomicInteger(0);
 
         // Range of servers that will be assigned to each thread

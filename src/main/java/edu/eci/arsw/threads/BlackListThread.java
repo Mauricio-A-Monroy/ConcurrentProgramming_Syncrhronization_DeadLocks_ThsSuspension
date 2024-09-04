@@ -3,6 +3,7 @@ package edu.eci.arsw.threads;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import  edu.eci.arsw.spamkeywordsdatasource.*;
@@ -18,7 +19,7 @@ public class BlackListThread extends Thread{
 
     private int limit;
 
-    public BlackListThread(int low, int high, String ipAddress, List<Integer> blackListOcurrences, AtomicInteger checkedListsCount, int limit){
+    public BlackListThread(int low, int high, String ipAddress, CopyOnWriteArrayList<Integer> blackListOcurrences, AtomicInteger checkedListsCount, int limit){
         this.lowServer = low;
         this.highServer = high;
         this.ipAddress = ipAddress;
@@ -56,13 +57,9 @@ public class BlackListThread extends Thread{
         HostBlacklistsDataSourceFacade skds=HostBlacklistsDataSourceFacade.getInstance();
         for (int i = this.getLowServer(); i <= this.getHighServer(); i++){
             if (skds.isInBlackListServer(i, this.getIpAddress())){
-                synchronized (blackListOcurrences) {
-                    blackListOcurrences.add(i);
-                }
+                blackListOcurrences.add(i);
             }
-            synchronized (blackListOcurrences){
-                if (blackListOcurrences.size() == limit) break;
-            }
+            if (blackListOcurrences.size() == limit) break;
             checkedListsCount.getAndIncrement();
         }
 

@@ -2,6 +2,7 @@ package edu.eci.arsw.highlandersim;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Immortal extends Thread {
 
@@ -29,22 +30,12 @@ public class Immortal extends Thread {
         this.immortalsPopulation = immortalsPopulation;
         this.health = health;
         this.defaultDamageValue=defaultDamageValue;
-        stillAlive = true;
+        this.stillAlive = true;
     }
 
     public void run() {
 
         while (stillAlive) {
-
-            synchronized (this) {
-                while (isPaused) {
-                    try {
-                        wait();  // Pausa el hilo si `paused` es true
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
 
             Immortal im;
 
@@ -67,6 +58,15 @@ public class Immortal extends Thread {
                 e.printStackTrace();
             }
 
+            synchronized (this) {
+                while (isPaused && stillAlive) {
+                    try {
+                        wait();  // Pausa el hilo si `paused` es true
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
 
     }
@@ -88,8 +88,8 @@ public class Immortal extends Thread {
                     } else if (immortalsPopulation.contains(i2)) {
                         i2.alreadyDead();
                         immortalsPopulation.remove(i2);
-                        System.out.println(i2.name + " HAS DIED!!! AHHHHHHHHHH!!!!!!!!!!!!!");
-                        System.out.println(immortalsPopulation);
+                        //System.out.println(i2.name + " HAS DIED!!! AHHHHHHHHHH!!!!!!!!!!!!!");
+                        //System.out.println(immortalsPopulation);
                         updateCallback.processReport(this + " says:" + i2 + " is already dead!\n");
                     }
                 }
