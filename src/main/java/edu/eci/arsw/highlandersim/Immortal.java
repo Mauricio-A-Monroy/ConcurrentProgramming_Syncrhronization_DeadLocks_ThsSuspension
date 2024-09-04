@@ -1,7 +1,7 @@
 package edu.eci.arsw.highlandersim;
 
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Immortal extends Thread {
 
@@ -11,25 +11,41 @@ public class Immortal extends Thread {
     
     private int defaultDamageValue;
 
-    private final List<Immortal> immortalsPopulation;
+    private final CopyOnWriteArrayList<Immortal> immortalsPopulation;
 
     private final String name;
 
     private final Random r = new Random(System.currentTimeMillis());
 
+    private boolean isPaused = false;
 
-    public Immortal(String name, List<Immortal> immortalsPopulation, int health, int defaultDamageValue, ImmortalUpdateReportCallback ucb) {
+    private boolean stillAlive;
+
+
+    public Immortal(String name, CopyOnWriteArrayList<Immortal> immortalsPopulation, int health, int defaultDamageValue, ImmortalUpdateReportCallback ucb) {
         super(name);
         this.updateCallback=ucb;
         this.name = name;
         this.immortalsPopulation = immortalsPopulation;
         this.health = health;
         this.defaultDamageValue=defaultDamageValue;
+        stillAlive = true;
     }
 
     public void run() {
 
-        while (true) {
+        while (stillAlive) {
+
+            synchronized (this) {
+                while (isPaused) {
+                    try {
+                        wait();  // Pausa el hilo si `paused` es true
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
             Immortal im;
 
             int myIndex = immortalsPopulation.indexOf(this);
@@ -46,7 +62,7 @@ public class Immortal extends Thread {
             this.fight(im);
 
             try {
-                Thread.sleep(1);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -56,15 +72,29 @@ public class Immortal extends Thread {
     }
 
     public void fight(Immortal i2) {
+        // Sorting by name
+        List<Immortal> immortals = new ArrayList<>();
+        immortals.add(this);
+        immortals.add(i2);
+        Collections.sort(immortals, new ImmortalComparator());
 
-        if (i2.getHealth() > 0) {
-            i2.changeHealth(i2.getHealth() - defaultDamageValue);
-            this.health += defaultDamageValue;
-            updateCallback.processReport("Fight: " + this + " vs " + i2+"\n");
-        } else {
-            updateCallback.processReport(this + " says:" + i2 + " is already dead!\n");
+        synchronized (immortals.get(0)){
+            synchronized (immortals.get(1)){
+                if(immortalsPopulation.contains(this) && immortalsPopulation.contains(i2)){
+                    if (i2.getHealth() > 0) {
+                        i2.changeHealth(i2.getHealth() - defaultDamageValue);
+                        this.health += defaultDamageValue;
+                        updateCallback.processReport("Fight: " + this + " vs " + i2+"\n");
+                    } else if (immortalsPopulation.contains(i2)) {
+                        i2.alreadyDead();
+                        immortalsPopulation.remove(i2);
+                        System.out.println(i2.name + " HAS DIED!!! AHHHHHHHHHH!!!!!!!!!!!!!");
+                        System.out.println(immortalsPopulation);
+                        updateCallback.processReport(this + " says:" + i2 + " is already dead!\n");
+                    }
+                }
+            }
         }
-
     }
 
     public void changeHealth(int v) {
@@ -75,9 +105,19 @@ public class Immortal extends Thread {
         return health;
     }
 
+    public void alreadyDead(){ this.stillAlive = false; }
+
+    public void setPaused(boolean isPaused) {
+        synchronized (this) {
+            this.isPaused = isPaused;
+            if (!isPaused) {
+                notifyAll();  // Notifica a todos los hilos que están esperando
+            }
+        }
+    }
+
     @Override
     public String toString() {
-
         return name + "[" + health + "]";
     }
 
